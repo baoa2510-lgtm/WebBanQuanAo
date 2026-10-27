@@ -1,29 +1,37 @@
-import streamlit as st
-from database import init_db, get_products, money
 
-st.set_page_config(page_title="Shop Quần Áo Basic", page_icon="👕", layout="wide")
+import streamlit as st
+from database import init_db
+
+st.set_page_config(
+    page_title="Đăng nhập - Shop quần áo",
+    page_icon="👕",
+    layout="centered"
+)
+
 init_db()
 
-st.title("👕 Shop Quần Áo Basic")
-st.write("Chào mừng bạn đến với cửa hàng quần áo.")
+# Kiểm tra trạng thái đăng nhập
+if not st.session_state.get("logged_in", False):
+    st.title("👕 SHOP QUẦN ÁO")
+    st.subheader("Đăng nhập để tiếp tục")
 
-products = get_products()
-if not products:
-    st.info("Cửa hàng chưa có sản phẩm.")
+    # Giữ trang đăng nhập riêng biệt
+    st.page_link(
+        "pages/5_DangNhap.py",
+        label="🔐 Đăng nhập / Đăng ký",
+        use_container_width=True
+    )
+
+    st.info("Vui lòng nhấn nút trên để đăng nhập hoặc đăng ký.")
+
 else:
-    cols = st.columns(3)
-    for i, p in enumerate(products):
-        with cols[i % 3]:
-            with st.container(border=True):
-                if p["image_url"]:
-                    st.image(p["image_url"], use_container_width=True)
-                else:
-                    st.markdown("# 👕")
-                st.subheader(p["name"])
-                st.caption(f"Danh mục: {p['category']}")
-                st.markdown(f"### {money(p['price'])}")
-                st.write(f"Tồn kho: {p['stock']}")
-                if p["description"]:
-                    st.write(p["description"])
+    st.title("👕 SHOP QUẦN ÁO")
+    st.success(
+        f"Xin chào, {st.session_state.get('username', 'người dùng')}!"
+    )
 
-st.sidebar.info("Chọn trang ở thanh bên. Đăng nhập để vào khu vực quản trị.")
+    st.write("Bạn đã đăng nhập thành công.")
+
+    if st.button("Đăng xuất"):
+        st.session_state.clear()
+        st.rerun()
