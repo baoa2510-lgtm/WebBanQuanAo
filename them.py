@@ -1,27 +1,61 @@
+
 import streamlit as st
-from database import init_db, connect, require_login
+import os
+from database import connect, require_admin
 
-st.set_page_config(page_title="Thêm sản phẩm", page_icon="➕")
-init_db()
-st.title("➕ Thêm sản phẩm")
-require_login()
+st.title("Thêm sản phẩm")
+require_admin()
 
-with st.form("add_product", clear_on_submit=True):
-    name = st.text_input("Tên sản phẩm *")
-    category = st.selectbox("Danh mục", ["Áo", "Quần", "Áo khoác", "Phụ kiện", "Khác"])
-    price = st.number_input("Giá (VNĐ)", min_value=0, value=99000, step=1000)
-    stock = st.number_input("Số lượng tồn kho", min_value=0, value=1, step=1)
-    description = st.text_area("Mô tả")
-    image_url = st.text_input("Link ảnh (không bắt buộc)")
-    submitted = st.form_submit_button("Thêm sản phẩm")
+name = st.text_input("Tên sản phẩm")
+category = st.selectbox("Danh mục", ["Áo", "Quần", "Phụ kiện"])
+price = st.number_input("Giá tiền", min_value=1000, step=1000)
+stock = st.number_input("Số lượng", min_value=0, step=1)
+description = st.text_area("Mô tả")
 
-if submitted:
+image = st.file_uploader(
+    "Chọn ảnh sản phẩm",
+    type=["jpg", "jpeg", "png", "webp"],
+    key="anh_san_pham"
+)
+
+if st.button("Thêm sản phẩm"):
     if not name.strip():
-        st.error("Vui lòng nhập tên sản phẩm.")
+        st.error("Vui lòng nhập tên sản phẩm!")
+
     else:
-        with connect() as conn:
-            conn.execute("""
-                INSERT INTO products (name, category, price, stock, description, image_url)
-                VALUES (?, ?, ?, ?, ?, ?)
-            """, (name.strip(), category, int(price), int(stock), description.strip(), image_url.strip()))
-        st.success(f"Đã thêm sản phẩm: {name.strip()}")
+        image_url = ""
+
+        # Lưu ảnh nếu người dùng đã chọn ảnh
+        if image is not None:
+            os.makedirs("images", exist_ok=True)
+
+            image_url = os.path.abspath(
+                os.path.join("images", image.name)
+            )
+
+            with open(image_url, "wb") as f:
+                f.write(image.getbuffer())
+
+        # Lưu thông tin sản phẩm vào database
+        try:
+            with connect() as conn:
+                conn.execute("""
+                    INSERT INTO products
+                    (name, category, price, stock, description, image_url)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                """, (
+                    name.strip(),
+                    category,
+                    price,
+                    stock,
+                    description,
+                    image_url
+                ))
+
+            st.success("Thêm sản phẩm thành công!")
+
+            if image_url:
+                st.image(image_url, caption=name, width=250)
+
+        except Exception as e:
+            st.error(f"Lỗi khi thêm sản phẩm: {e}")
