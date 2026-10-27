@@ -1,35 +1,47 @@
+
 import streamlit as st
-from database import init_db, connect, verify_password
+from database import connect, hash_password, check_password
 
-st.set_page_config(page_title="Đăng nhập", page_icon="🔐")
-init_db()
-st.title("🔐 Đăng nhập quản trị")
+st.title("Tài khoản")
 
-if st.session_state.get("logged_in", False):
-    st.success(f"Đang đăng nhập với tài khoản: {st.session_state.get('username', '')}")
-    if st.button("Đăng xuất"):
-        st.session_state.logged_in = False
-        st.session_state.username = ""
-        st.success("Đã đăng xuất.")
-        st.rerun()
-else:
-    with st.form("login_form"):
-        username = st.text_input("Tên đăng nhập")
-        password = st.text_input("Mật khẩu", type="password")
-        submitted = st.form_submit_button("Đăng nhập")
+action = st.radio("Chọn chức năng", ["Đăng nhập", "Đăng ký"])
 
-    if submitted:
+username = st.text_input("Tên đăng nhập")
+password = st.text_input("Mật khẩu", type="password")
+
+if st.button(action):
+    if not username.strip() or not password:
+        st.error("Vui lòng nhập đầy đủ thông tin.")
+    else:
         with connect() as conn:
             user = conn.execute(
-                "SELECT password_hash FROM users WHERE username=?",
+                "SELECT * FROM users WHERE username=?",
                 (username.strip(),)
             ).fetchone()
-        if user and verify_password(password, user["password_hash"]):
-            st.session_state.logged_in = True
-            st.session_state.username = username.strip()
-            st.success("Đăng nhập thành công.")
-            st.rerun()
-        else:
-            st.error("Tên đăng nhập hoặc mật khẩu không đúng.")
 
-st.caption("Tài khoản demo: admin / admin123. Đổi mật khẩu trước khi dùng thật.")
+            if action == "Đăng nhập":
+                if user and check_password(password, user[1]):
+                    st.session_state.logged_in = True
+                    st.session_state.username = user[0]
+                    st.session_state.role = user[2]
+                    st.success("Đăng nhập thành công!")
+                    st.rerun()
+                else:
+                    st.error("Sai tên đăng nhập hoặc mật khẩu.")
+
+            elif user:
+                st.error("Tên đăng nhập đã tồn tại.")
+            else:
+                conn.execute("""
+                    INSERT INTO users (username, password_hash, role)
+                    VALUES (?, ?, 'user')
+                """, (username.strip(), hash_password(password)))
+
+                st.success("Đăng ký thành công! Hãy đăng nhập.")
+
+if st.session_state.get("logged_in", False):
+    st.write("Đang đăng nhập:", st.session_state.username)
+
+    if st.button("Đăng xuất"):
+        st.session_state.clear()
+        st.rerun()
