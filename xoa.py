@@ -1,24 +1,28 @@
-import streamlit as st
-from database import init_db, connect, get_products, money, require_login
 
-st.set_page_config(page_title="Xóa sản phẩm", page_icon="🗑️")
-init_db()
-st.title("🗑️ Xóa sản phẩm")
-require_login()
+import streamlit as st
+from database import connect, get_products, require_admin
+
+st.title("Xóa sản phẩm")
+require_admin()
 
 products = get_products()
-if not products:
+
+if products:
+    names = {
+        f'{p["id"]} - {p["name"]}': p["id"]
+        for p in products
+    }
+
+    selected = st.selectbox("Chọn sản phẩm", list(names.keys()))
+
+    if st.button("Xóa sản phẩm"):
+        with connect() as conn:
+            conn.execute(
+                "DELETE FROM products WHERE id=?",
+                (names[selected],)
+            )
+
+        st.success("Đã xóa sản phẩm!")
+        st.rerun()
+else:
     st.info("Không có sản phẩm để xóa.")
-    st.stop()
-
-options = {f"#{p['id']} — {p['name']} ({money(p['price'])})": p for p in products}
-choice = st.selectbox("Chọn sản phẩm cần xóa", list(options.keys()))
-selected = options[choice]
-st.warning(f"Bạn đang chọn: **{selected['name']}**. Thao tác xóa không thể tự hoàn tác.")
-confirm = st.checkbox("Tôi xác nhận muốn xóa sản phẩm này.")
-
-if st.button("Xóa sản phẩm", type="primary", disabled=not confirm):
-    with connect() as conn:
-        conn.execute("DELETE FROM products WHERE id=?", (selected["id"],))
-    st.success("Đã xóa sản phẩm.")
-    st.rerun()
