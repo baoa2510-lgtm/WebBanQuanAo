@@ -1,37 +1,52 @@
 
 import streamlit as st
-from database import init_db
+from pathlib import Path
 
 st.set_page_config(
-    page_title="Đăng nhập - Shop quần áo",
+    page_title="Shop quần áo",
     page_icon="👕",
     layout="centered"
 )
 
-init_db()
+pages_dir = Path(__file__).parent / "pages"
 
-# Kiểm tra trạng thái đăng nhập
-if not st.session_state.get("logged_in", False):
-    st.title("👕 SHOP QUẦN ÁO")
-    st.subheader("Đăng nhập để tiếp tục")
+login_page = st.Page(
+    str(pages_dir / "DangNhap.py"),
+    title="Đăng nhập / Đăng ký",
+    icon="🔐",
+    default=True
+)
 
-    # Giữ trang đăng nhập riêng biệt
-    st.page_link(
-        "pages/5_DangNhap.py",
-        label="🔐 Đăng nhập / Đăng ký",
-        use_container_width=True
-    )
+admin_page = st.Page(
+    str(pages_dir / "Admin.py"),
+    title="Admin",
+    icon="⚙️"
+)
 
-    st.info("Vui lòng nhấn nút trên để đăng nhập hoặc đăng ký.")
+add_page = st.Page(
+    str(pages_dir / "Them.py"),
+    title="Thêm sản phẩm",
+    icon="➕"
+)
 
-else:
-    st.title("👕 SHOP QUẦN ÁO")
-    st.success(
-        f"Xin chào, {st.session_state.get('username', 'người dùng')}!"
-    )
+edit_page = st.Page(
+    str(pages_dir / "Sua.py"),
+    title="Sửa sản phẩm",
+    icon="✏️"
+)
 
-    st.write("Bạn đã đăng nhập thành công.")
+delete_page = st.Page(
+    str(pages_dir / "Xoa.py"),
+    title="Xóa sản phẩm",
+    icon="🗑️"
+)
 
-    if st.button("Đăng xuất"):
-        st.session_state.clear()
-        st.rerun()
+navigation = st.navigation([
+    login_page,
+    admin_page,
+    add_page,
+    edit_page,
+    delete_page
+])
+
+navigation.run()
