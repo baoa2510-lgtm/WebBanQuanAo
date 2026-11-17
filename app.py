@@ -94,11 +94,8 @@ if menu == "🏠 Trang Chủ":
     st.subheader("📊 Tổng Quan Cửa Hàng")
     col_m1, col_m2, col_m3 = st.columns(3)
     col_m1.metric("Tổng số sản phẩm", len(products_list))
-    col_m2.metric("Thành viên hệ thống", len(st.session_state.get("users", {})))
     col_m3.metric("Trạng thái", "Đang hoạt động 🟢")
     
-    st.divider()
-    st.markdown("👉 Hãy chọn mục **🛍️ Cửa Hàng** ở thanh menu bên trái để xem chi tiết các sản phẩm hoặc đăng nhập quản trị.")
 
 # --- NỘI DUNG TRANG CỬA HÀNG & QUẢN LÝ ---
 elif menu == "🛍️ Cửa Hàng":
@@ -107,7 +104,6 @@ elif menu == "🛍️ Cửa Hàng":
     is_admin = st.session_state.logged_in and (st.session_state.username == "admin")
 
     if is_admin:
-        st.success("🔓 Chào Admin!")
         with st.expander("➕ Thêm sản phẩm mới"):
             with st.form("add_form", clear_on_submit=True):
                 col_f1, col_f2 = st.columns(2)
