@@ -101,10 +101,6 @@ if is_admin:
                     st.rerun()
                 else:
                     st.warning("Tên sản phẩm không được để trống.")
-elif st.session_state.logged_in:
-    st.info("ℹ️ Bạn đang đăng nhập bằng tài khoản khách hàng (Chỉ có quyền xem sản phẩm). Hãy đăng nhập tài khoản **admin** (mật khẩu: **123**) nếu muốn quản lý.")
-else:
-    st.info("💡 Gợi ý: Đăng nhập tài khoản `admin` (mật khẩu `123`) để trải nghiệm quyền quản trị Thêm/Sửa/Xóa.")
 
 st.divider()
 
