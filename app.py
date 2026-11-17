@@ -158,4 +158,26 @@ elif menu == "🛍️ Cửa Hàng & Quản Lý":
                     if is_admin:
                         c1, c2 = st.columns(2)
                         
-                        if c1.button("🗑️ Xóa", key=f"del_{item['id']}", use_container_
+                        if c1.button("🗑️ Xóa", key=f"del_{item['id']}", use_container_width=True):
+                            st.session_state.products = [p for p in st.session_state.products if p["id"] != item["id"]]
+                            st.rerun()
+                            
+                        with c2.popover("✏️ Sửa", use_container_width=True):
+                            edit_name = st.text_input("Tên", value=item["name"], key=f"ename_{item['id']}")
+                            edit_price = st.number_input("Giá", value=item["price"], step=10000, key=f"eprice_{item['id']}")
+                            edit_size = st.text_input("Size", value=item["size"], key=f"esize_{item['id']}")
+                            
+                            edit_file = st.file_uploader("Thay đổi ảnh từ máy", type=["jpg", "jpeg", "png"], key=f"efile_{item['id']}")
+                            
+                            if st.button("Cập nhật", key=f"save_{item['id']}"):
+                                item["name"] = edit_name
+                                item["price"] = edit_price
+                                item["size"] = edit_size
+                                
+                                if edit_file is not None:
+                                    edit_image_path = os.path.join(UPLOAD_DIR, edit_file.name)
+                                    with open(edit_image_path, "wb") as f:
+                                        f.write(edit_file.getbuffer())
+                                    item["image"] = edit_image_path
+                                    
+                                st.rerun()
