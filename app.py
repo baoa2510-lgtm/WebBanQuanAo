@@ -37,7 +37,7 @@ if "logged_in" not in st.session_state:
 
 # --- THANH BÊN (ĐĂNG NHẬP / ĐĂNG KÝ & ĐIỀU HƯỚNG) ---
 with st.sidebar:
-    st.title("Menu")
+    st.title("📂 Menu Điều Hướng")
     menu = st.radio("Chọn trang:", ["🏠 Trang Chủ", "🛍️ Cửa Hàng"])
     
     st.divider()
@@ -82,12 +82,19 @@ with st.sidebar:
 
 # --- NỘI DUNG TRANG CHỦ ---
 if menu == "🏠 Trang Chủ":
-    st.title("Chào Mừng Đến Với Cửa Hàng Thời Trang Đẳng Cấp")
-    st.image("https://report.adidas-group.com/2022/en/_assets/gallery/mag-2-hero.jpg", use_container_width=True)
+    st.title("🌟 Chào Mừng Đến Với Cửa Hàng Thời Trang")
+    
+    st.image("", use_container_width=True)
+    
     st.subheader("📊 Tổng Quan Cửa Hàng")
     col_m1, col_m2, col_m3 = st.columns(3)
     col_m1.metric("Tổng số sản phẩm", len(st.session_state.products))
+    col_m2.metric("Thành viên hệ thống", len(st.session_state.users))
     col_m3.metric("Trạng thái", "Đang hoạt động 🟢")
+    
+    st.divider()
+    st.markdown("👉 Hãy chọn mục **🛍️ Trang chủ** ở thanh menu bên trái để xem chi tiết các sản phẩm hoặc đăng nhập quản trị.")
+
 # --- NỘI DUNG TRANG CỬA HÀNG & QUẢN LÝ ---
 elif menu == "🛍️ Trang chủ":
     st.title("👕 Cửa Hàng Quần Áo Trực Tuyến")
