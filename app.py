@@ -13,6 +13,23 @@ if not os.path.exists(UPLOAD_DIR):
 if "users" not in st.session_state:
     st.session_state.users = {"admin": "123", "khachhang": "123"}
 
+if "products" not in st.session_state:
+    st.session_state.products = [
+        {
+            "id": 1,
+            "name": "Áo Thun Basic Trắng",
+            "price": 150000,
+            "size": "M, L, XL",
+            "image": "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400"
+        },
+        {
+            "id": 2,
+            "name": "Quần Jeans Xanh Classic",
+            "price": 350000,
+            "size": "29, 30, 31, 32",
+            "image": "https://images.unsplash.com/photo-1542272604-787c3835535d?w=400"
+        }
+    ]
 
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
@@ -20,8 +37,9 @@ if "logged_in" not in st.session_state:
 
 # --- THANH BÊN (ĐĂNG NHẬP / ĐĂNG KÝ & ĐIỀU HƯỚNG) ---
 with st.sidebar:
-    st.title("📂 Menu")
-    menu = st.radio("Chọn trang:", ["🏠 Trang Chủ", "🛍️ Cửa Hàng & Quản Lý"])
+    st.title("📂 Menu Điều Hướng")
+    # Giữ nguyên cấu trúc menu bạn đã chỉnh sửa
+    menu = st.radio("Chọn trang:", ["🏠 Trang Chủ", "🛍️ Cửa Hàng"])
     
     st.divider()
     st.title("Tài Khoản")
@@ -54,7 +72,7 @@ with st.sidebar:
     else:
         st.success(f"Xin chào, **{st.session_state.username}**!")
         if st.session_state.username == "admin":
-            st.info("⭐ Quản trị viên (Admin)")
+            st.info("⭐ Quản trị viên ")
         else:
             st.info("👤 Khách hàng")
             
@@ -63,27 +81,33 @@ with st.sidebar:
             st.session_state.username = ""
             st.rerun()
 
+# Lấy danh sách sản phẩm an toàn tránh lỗi KeyError khi chuyển trang
+products_list = st.session_state.get("products", [])
+
 # --- NỘI DUNG TRANG CHỦ ---
 if menu == "🏠 Trang Chủ":
     st.title("🌟 Chào Mừng Đến Với Cửa Hàng Thời Trang")
     
-    # Sử dụng ảnh banner mặc định an toàn
-    st.image("https://assets.wuiltweb.com/311315/01312025105618679cac52b5ff0.jpg", use_container_width=True)
+    # Hiển thị ảnh banner trang chủ
+    st.image("https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200", use_container_width=True)
     
     st.subheader("📊 Tổng Quan Cửa Hàng")
     col_m1, col_m2, col_m3 = st.columns(3)
-    col_m1.metric("Tổng số sản phẩm", len(st.session_state.products))
+    col_m1.metric("Tổng số sản phẩm", len(products_list))
+    col_m2.metric("Thành viên hệ thống", len(st.session_state.get("users", {})))
     col_m3.metric("Trạng thái", "Đang hoạt động 🟢")
     
     st.divider()
+    st.markdown("👉 Hãy chọn mục **🛍️ Cửa Hàng** ở thanh menu bên trái để xem chi tiết các sản phẩm hoặc đăng nhập quản trị.")
 
 # --- NỘI DUNG TRANG CỬA HÀNG & QUẢN LÝ ---
-elif menu == "🛍️ Cửa Hàng & Quản Lý":
+elif menu == "🛍️ Cửa Hàng":
     st.title("👕 Cửa Hàng Quần Áo Trực Tuyến")
 
     is_admin = st.session_state.logged_in and (st.session_state.username == "admin")
 
     if is_admin:
+        st.success("🔓 Chào Admin!")
         with st.expander("➕ Thêm sản phẩm mới"):
             with st.form("add_form", clear_on_submit=True):
                 col_f1, col_f2 = st.columns(2)
@@ -102,28 +126,29 @@ elif menu == "🛍️ Cửa Hàng & Quản Lý":
                             with open(image_path, "wb") as f:
                                 f.write(uploaded_file.getbuffer())
                         
-                        new_id = max([p["id"] for p in st.session_state.products], default=0) + 1
-                        st.session_state.products.append({
+                        new_id = max([p["id"] for p in products_list], default=0) + 1
+                        products_list.append({
                             "id": new_id,
                             "name": new_name,
                             "price": new_price,
                             "size": new_size,
                             "image": image_path
                         })
+                        st.session_state.products = products_list
                         st.success("Đã thêm sản phẩm kèm ảnh thành công!")
                         st.rerun()
                     else:
                         st.warning("Tên sản phẩm không được để trống.")
-
+                        
     st.divider()
 
     st.subheader("Danh sách sản phẩm")
 
-    if not st.session_state.products:
+    if not products_list:
         st.write("Hiện chưa có sản phẩm nào.")
     else:
         cols = st.columns(3)
-        for index, item in enumerate(st.session_state.products):
+        for index, item in enumerate(products_list):
             with cols[index % 3]:
                 with st.container(border=True):
                     st.image(item["image"], use_container_width=True)
@@ -135,7 +160,7 @@ elif menu == "🛍️ Cửa Hàng & Quản Lý":
                         c1, c2 = st.columns(2)
                         
                         if c1.button("🗑️ Xóa", key=f"del_{item['id']}", use_container_width=True):
-                            st.session_state.products = [p for p in st.session_state.products if p["id"] != item["id"]]
+                            st.session_state.products = [p for p in products_list if p["id"] != item["id"]]
                             st.rerun()
                             
                         with c2.popover("✏️ Sửa", use_container_width=True):
@@ -152,8 +177,9 @@ elif menu == "🛍️ Cửa Hàng & Quản Lý":
                                 
                                 if edit_file is not None:
                                     edit_image_path = os.path.join(UPLOAD_DIR, edit_file.name)
-                                    with open(edit_image_path, "wb") as f: 
+                                    with open(edit_image_path, "wb") as f:
                                         f.write(edit_file.getbuffer())
                                     item["image"] = edit_image_path
                                     
+                                st.session_state.products = products_list
                                 st.rerun()
