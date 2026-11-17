@@ -38,7 +38,7 @@ if "logged_in" not in st.session_state:
 # --- THANH BÊN (ĐĂNG NHẬP / ĐĂNG KÝ & ĐIỀU HƯỚNG) ---
 with st.sidebar:
     st.title("📂 Menu Điều Hướng")
-    menu = st.radio("Chọn trang:", ["🏠 Trang Chủ", "🛍️ Cửa Hàng"])
+    menu = st.radio("Chọn trang:", ["🏠 Trang Chủ", "🛍️ Cửa Hàng & Quản Lý"])
     
     st.divider()
     st.title("Tài Khoản")
@@ -71,9 +71,9 @@ with st.sidebar:
     else:
         st.success(f"Xin chào, **{st.session_state.username}**!")
         if st.session_state.username == "admin":
-            st.info("⭐ Quản trị viên ")
+            st.info("⭐ Quyền hạn: Quản trị viên (Admin)")
         else:
-            st.info("👤 Khách hàng")
+            st.info("👤 Quyền hạn: Khách hàng")
             
         if st.button("Đăng xuất", use_container_width=True):
             st.session_state.logged_in = False
@@ -83,8 +83,10 @@ with st.sidebar:
 # --- NỘI DUNG TRANG CHỦ ---
 if menu == "🏠 Trang Chủ":
     st.title("🌟 Chào Mừng Đến Với Cửa Hàng Thời Trang")
+    st.markdown("Nơi cung cấp các xu hướng thời trang trẻ trung, năng động và phong cách.")
     
-    st.image("", use_container_width=True)
+    # Sử dụng ảnh banner mặc định an toàn
+    st.image("https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200", use_container_width=True)
     
     st.subheader("📊 Tổng Quan Cửa Hàng")
     col_m1, col_m2, col_m3 = st.columns(3)
@@ -93,16 +95,16 @@ if menu == "🏠 Trang Chủ":
     col_m3.metric("Trạng thái", "Đang hoạt động 🟢")
     
     st.divider()
-    st.markdown("👉 Hãy chọn mục **🛍️ Trang chủ** ở thanh menu bên trái để xem chi tiết các sản phẩm hoặc đăng nhập quản trị.")
+    st.markdown("👉 Hãy chọn mục **🛍️ Cửa Hàng & Quản Lý** ở thanh menu bên trái để xem chi tiết các sản phẩm hoặc đăng nhập quản trị.")
 
 # --- NỘI DUNG TRANG CỬA HÀNG & QUẢN LÝ ---
-elif menu == "🛍️ Trang chủ":
+elif menu == "🛍️ Cửa Hàng & Quản Lý":
     st.title("👕 Cửa Hàng Quần Áo Trực Tuyến")
 
     is_admin = st.session_state.logged_in and (st.session_state.username == "admin")
 
     if is_admin:
-        st.success("🔓 Chào Admin!")
+        st.success("🔓 Chào Admin! Bạn có quyền Thêm, Sửa, Xóa sản phẩm.")
         with st.expander("➕ Thêm sản phẩm mới"):
             with st.form("add_form", clear_on_submit=True):
                 col_f1, col_f2 = st.columns(2)
@@ -133,6 +135,11 @@ elif menu == "🛍️ Trang chủ":
                         st.rerun()
                     else:
                         st.warning("Tên sản phẩm không được để trống.")
+    elif st.session_state.logged_in:
+        st.info("ℹ️ Bạn đang đăng nhập bằng tài khoản khách hàng. Hãy đăng nhập tài khoản **admin** (mật khẩu: **123**) nếu muốn quản lý.")
+    else:
+        st.info("💡 Gợi ý: Đăng nhập tài khoản `admin` (mật khẩu `123`) ở thanh bên trái để trải nghiệm quyền quản trị Thêm/Sửa/Xóa.")
+
     st.divider()
 
     st.subheader("Danh sách sản phẩm")
