@@ -13,23 +13,6 @@ if not os.path.exists(UPLOAD_DIR):
 if "users" not in st.session_state:
     st.session_state.users = {"admin": "123", "khachhang": "123"}
 
-if "products" not in st.session_state:
-    st.session_state.products = [
-        {
-            "id": 1,
-            "name": "Áo Thun Basic Trắng",
-            "price": 150000,
-            "size": "M, L, XL",
-            "image": "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400"
-        },
-        {
-            "id": 2,
-            "name": "Quần Jeans Xanh Classic",
-            "price": 350000,
-            "size": "29, 30, 31, 32",
-            "image": "https://images.unsplash.com/photo-1542272604-787c3835535d?w=400"
-        }
-    ]
 
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
@@ -71,9 +54,9 @@ with st.sidebar:
     else:
         st.success(f"Xin chào, **{st.session_state.username}**!")
         if st.session_state.username == "admin":
-            st.info("⭐ Quyền hạn: Quản trị viên (Admin)")
+            st.info("⭐ Quản trị viên (Admin)")
         else:
-            st.info("👤 Quyền hạn: Khách hàng")
+            st.info("👤 Khách hàng")
             
         if st.button("Đăng xuất", use_container_width=True):
             st.session_state.logged_in = False
@@ -83,7 +66,6 @@ with st.sidebar:
 # --- NỘI DUNG TRANG CHỦ ---
 if menu == "🏠 Trang Chủ":
     st.title("🌟 Chào Mừng Đến Với Cửa Hàng Thời Trang")
-    st.markdown("Nơi cung cấp các xu hướng thời trang trẻ trung, năng động và phong cách.")
     
     # Sử dụng ảnh banner mặc định an toàn
     st.image("https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200", use_container_width=True)
