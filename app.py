@@ -1,11 +1,16 @@
 import streamlit as st
+import os
 
 # Cấu hình trang
 st.set_page_config(page_title="Cửa Hàng Thời Trang", layout="wide")
 
+# Tạo thư mục uploads nếu chưa có
+UPLOAD_DIR = "uploads"
+if not os.path.exists(UPLOAD_DIR):
+    os.makedirs(UPLOAD_DIR)
+
 # --- KHỞI TẠO DỮ LIỆU ---
 if "users" not in st.session_state:
-    # Tài khoản admin có quyền quản trị, tài khoản thường chỉ xem
     st.session_state.users = {"admin": "123", "khachhang": "123"}
 
 if "products" not in st.session_state:
@@ -85,19 +90,29 @@ if is_admin:
             new_name = col1.text_input("Tên sản phẩm")
             new_price = col2.number_input("Giá bán (VNĐ)", min_value=0, step=10000)
             new_size = col1.text_input("Kích cỡ (VD: S, M, L)")
-            new_img = col2.text_input("Link hình ảnh (URL)", value="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400")
+            
+            # Chọn ảnh từ thư mục máy tính
+            uploaded_file = st.file_uploader("Tải ảnh sản phẩm từ máy tính", type=["jpg", "jpeg", "png"])
             
             if st.form_submit_button("Lưu sản phẩm"):
                 if new_name:
+                    image_path = "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400" # Ảnh mặc định
+                    
+                    if uploaded_file is not None:
+                        # Lưu file vào thư mục uploads
+                        image_path = os.path.join(UPLOAD_DIR, uploaded_file.name)
+                        with open(image_path, "wb") as f:
+                            f.write(uploaded_file.getbuffer())
+                    
                     new_id = max([p["id"] for p in st.session_state.products], default=0) + 1
                     st.session_state.products.append({
                         "id": new_id,
                         "name": new_name,
                         "price": new_price,
                         "size": new_size,
-                        "image": new_img
+                        "image": image_path
                     })
-                    st.success("Đã thêm sản phẩm!")
+                    st.success("Đã thêm sản phẩm kèm ảnh thành công!")
                     st.rerun()
                 else:
                     st.warning("Tên sản phẩm không được để trống.")
@@ -131,11 +146,18 @@ else:
                         edit_name = st.text_input("Tên", value=item["name"], key=f"ename_{item['id']}")
                         edit_price = st.number_input("Giá", value=item["price"], step=10000, key=f"eprice_{item['id']}")
                         edit_size = st.text_input("Size", value=item["size"], key=f"esize_{item['id']}")
-                        edit_img = st.text_input("Link ảnh", value=item["image"], key=f"eimg_{item['id']}")
+                        
+                        edit_file = st.file_uploader("Thay đổi ảnh từ máy", type=["jpg", "jpeg", "png"], key=f"efile_{item['id']}")
                         
                         if st.button("Cập nhật", key=f"save_{item['id']}"):
                             item["name"] = edit_name
                             item["price"] = edit_price
                             item["size"] = edit_size
-                            item["image"] = edit_img
+                            
+                            if edit_file is not None:
+                                edit_image_path = os.path.join(UPLOAD_DIR, edit_file.name)
+                                with open(edit_image_path, "wb") as f:
+                                    f.write(edit_file.getbuffer())
+                                item["image"] = edit_image_path
+                                
                             st.rerun()
