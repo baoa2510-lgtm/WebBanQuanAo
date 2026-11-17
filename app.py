@@ -37,7 +37,7 @@ if "logged_in" not in st.session_state:
 
 # --- THANH BÊN (ĐĂNG NHẬP / ĐĂNG KÝ & ĐIỀU HƯỚNG) ---
 with st.sidebar:
-    st.title("📂 Menu Điều Hướng")
+    st.title("Menu")
     menu = st.radio("Chọn trang:", ["🏠 Trang Chủ", "🛍️ Cửa Hàng"])
     
     st.divider()
@@ -82,8 +82,8 @@ with st.sidebar:
 
 # --- NỘI DUNG TRANG CHỦ ---
 if menu == "🏠 Trang Chủ":
-    st.title("🌟 Chào Mừng Đến Với Cửa Hàng Thời Trang Đẳng Cấp 6789")
-    st.markdown("Nơi cung cấp các xu hướng thời trang trẻ trung, năng động và phong cách.")
+    st.title("🌟 Chào Mừng Đến Với Cửa Hàng Thời Trang Đẳng Cấp")
+    st.markdown("Nơi cung cấp  thời trang trẻ trung, phong cách.")
     
     st.image("https://report.adidas-group.com/2022/en/_assets/gallery/mag-2-hero.jpg", use_container_width=True)
     
