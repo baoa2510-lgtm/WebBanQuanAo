@@ -3,9 +3,10 @@ import streamlit as st
 # Cấu hình trang
 st.set_page_config(page_title="Cửa Hàng Thời Trang", layout="wide")
 
-# --- KHỞI TẠO DỮ LIỆU TRÊN SESSION STATE ---
+# --- KHỞI TẠO DỮ LIỆU ---
 if "users" not in st.session_state:
-    st.session_state.users = {"admin": "123"}
+    # Tài khoản admin có quyền quản trị, tài khoản thường chỉ xem
+    st.session_state.users = {"admin": "123", "khachhang": "123"}
 
 if "products" not in st.session_state:
     st.session_state.products = [
@@ -57,9 +58,14 @@ with st.sidebar:
                     st.error("Tài khoản đã tồn tại!")
                 else:
                     st.session_state.users[u_reg] = p_reg
-                    st.success("Tạo tài khoản thành công! Hãy chuyển sang tab Đăng nhập.")
+                    st.success("Tạo tài khoản thành công! Hãy sang tab Đăng nhập.")
     else:
         st.success(f"Xin chào, **{st.session_state.username}**!")
+        if st.session_state.username == "admin":
+            st.info("⭐ Quyền hạn: Quản trị viên (Admin)")
+        else:
+            st.info("👤 Quyền hạn: Khách hàng")
+            
         if st.button("Đăng xuất", use_container_width=True):
             st.session_state.logged_in = False
             st.session_state.username = ""
@@ -68,9 +74,11 @@ with st.sidebar:
 # --- GIAO DIỆN CHÍNH ---
 st.title("👕 Cửa Hàng Quần Áo Trực Tuyến")
 
-if st.session_state.logged_in:
-    st.info("Chế độ quản trị: Bạn có thể Thêm, Sửa hoặc Xóa sản phẩm.")
-    
+# Kiểm tra nếu là ADMIN thì mới hiện form Thêm sản phẩm
+is_admin = st.session_state.logged_in and (st.session_state.username == "admin")
+
+if is_admin:
+    st.success("🔓 Chào Admin! Bạn có quyền Thêm, Sửa, Xóa sản phẩm.")
     with st.expander("➕ Thêm sản phẩm mới"):
         with st.form("add_form", clear_on_submit=True):
             col1, col2 = st.columns(2)
@@ -93,6 +101,10 @@ if st.session_state.logged_in:
                     st.rerun()
                 else:
                     st.warning("Tên sản phẩm không được để trống.")
+elif st.session_state.logged_in:
+    st.info("ℹ️ Bạn đang đăng nhập bằng tài khoản khách hàng (Chỉ có quyền xem sản phẩm). Hãy đăng nhập tài khoản **admin** (mật khẩu: **123**) nếu muốn quản lý.")
+else:
+    st.info("💡 Gợi ý: Đăng nhập tài khoản `admin` (mật khẩu `123`) để trải nghiệm quyền quản trị Thêm/Sửa/Xóa.")
 
 st.divider()
 
@@ -111,7 +123,8 @@ else:
                 st.write(f"**Giá:** {item['price']:,} VNĐ")
                 st.write(f"**Size:** {item['size']}")
                 
-                if st.session_state.logged_in:
+                # Nút Sửa / Xóa CHỈ HIỆN KHI LÀ ADMIN
+                if is_admin:
                     c1, c2 = st.columns(2)
                     
                     if c1.button("🗑️ Xóa", key=f"del_{item['id']}", use_container_width=True):
