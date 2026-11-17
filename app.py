@@ -84,7 +84,6 @@ elif menu == "🛍️ Cửa Hàng & Quản Lý":
     is_admin = st.session_state.logged_in and (st.session_state.username == "admin")
 
     if is_admin:
-        st.success("🔓 Chào Admin!")
         with st.expander("➕ Thêm sản phẩm mới"):
             with st.form("add_form", clear_on_submit=True):
                 col_f1, col_f2 = st.columns(2)
