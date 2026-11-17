@@ -68,7 +68,7 @@ if menu == "🏠 Trang Chủ":
     st.title("🌟 Chào Mừng Đến Với Cửa Hàng Thời Trang")
     
     # Sử dụng ảnh banner mặc định an toàn
-    st.image("https://l1nq.com/q01bzfx", use_container_width=True)
+    st.image("https://assets.wuiltweb.com/311315/01312025105618679cac52b5ff0.jpg", use_container_width=True)
     
     st.subheader("📊 Tổng Quan Cửa Hàng")
     col_m1, col_m2, col_m3 = st.columns(3)
