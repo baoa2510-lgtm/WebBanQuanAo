@@ -38,7 +38,6 @@ if "logged_in" not in st.session_state:
 # --- THANH BÊN (ĐĂNG NHẬP / ĐĂNG KÝ & ĐIỀU HƯỚNG) ---
 with st.sidebar:
     st.title("📂 Menu Điều Hướng")
-    # Tạo menu chuyển đổi giữa Trang chủ và Cửa hàng sản phẩm
     menu = st.radio("Chọn trang:", ["🏠 Trang Chủ", "🛍️ Cửa Hàng & Quản Lý"])
     
     st.divider()
@@ -86,14 +85,13 @@ if menu == "🏠 Trang Chủ":
     st.title("🌟 Chào Mừng Đến Với Cửa Hàng Thời Trang")
     st.markdown("Nơi cung cấp các xu hướng thời trang trẻ trung, năng động và phong cách.")
     
-    # Banner / Hình ảnh giới thiệu trang chủ
     st.image("https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200", use_container_width=True)
     
     st.subheader("📊 Tổng Quan Cửa Hàng")
-    col1, col2, col3 = st.columns(3)
-    col1.metric("Tổng số sản phẩm", len(st.session_state.products))
-    col2.metric("Thành viên hệ thống", len(st.session_state.users))
-    col3.metric("Trạng thái", "Đang hoạt động 🟢")
+    col_m1, col_m2, col_m3 = st.columns(3)
+    col_m1.metric("Tổng số sản phẩm", len(st.session_state.products))
+    col_m2.metric("Thành viên hệ thống", len(st.session_state.users))
+    col_m3.metric("Trạng thái", "Đang hoạt động 🟢")
     
     st.divider()
     st.markdown("👉 Hãy chọn mục **🛍️ Cửa Hàng & Quản Lý** ở thanh menu bên trái để xem chi tiết các sản phẩm hoặc đăng nhập quản trị.")
@@ -102,11 +100,62 @@ if menu == "🏠 Trang Chủ":
 elif menu == "🛍️ Cửa Hàng & Quản Lý":
     st.title("👕 Cửa Hàng Quần Áo Trực Tuyến")
 
-    # Kiểm tra nếu là ADMIN thì mới hiện form Thêm sản phẩm
     is_admin = st.session_state.logged_in and (st.session_state.username == "admin")
 
     if is_admin:
         st.success("🔓 Chào Admin! Bạn có quyền Thêm, Sửa, Xóa sản phẩm.")
         with st.expander("➕ Thêm sản phẩm mới"):
             with st.form("add_form", clear_on_submit=True):
-                col1, col2
+                col_f1, col_f2 = st.columns(2)
+                new_name = col_f1.text_input("Tên sản phẩm")
+                new_price = col_f2.number_input("Giá bán (VNĐ)", min_value=0, step=10000)
+                new_size = col_f1.text_input("Kích cỡ (VD: S, M, L)")
+                
+                uploaded_file = st.file_uploader("Tải ảnh sản phẩm từ máy tính", type=["jpg", "jpeg", "png"])
+                
+                if st.form_submit_button("Lưu sản phẩm"):
+                    if new_name:
+                        image_path = "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400"
+                        
+                        if uploaded_file is not None:
+                            image_path = os.path.join(UPLOAD_DIR, uploaded_file.name)
+                            with open(image_path, "wb") as f:
+                                f.write(uploaded_file.getbuffer())
+                        
+                        new_id = max([p["id"] for p in st.session_state.products], default=0) + 1
+                        st.session_state.products.append({
+                            "id": new_id,
+                            "name": new_name,
+                            "price": new_price,
+                            "size": new_size,
+                            "image": image_path
+                        })
+                        st.success("Đã thêm sản phẩm kèm ảnh thành công!")
+                        st.rerun()
+                    else:
+                        st.warning("Tên sản phẩm không được để trống.")
+    elif st.session_state.logged_in:
+        st.info("ℹ️ Bạn đang đăng nhập bằng tài khoản khách hàng. Hãy đăng nhập tài khoản **admin** (mật khẩu: **123**) nếu muốn quản lý.")
+    else:
+        st.info("💡 Gợi ý: Đăng nhập tài khoản `admin` (mật khẩu `123`) ở thanh bên trái để trải nghiệm quyền quản trị Thêm/Sửa/Xóa.")
+
+    st.divider()
+
+    st.subheader("Danh sách sản phẩm")
+
+    if not st.session_state.products:
+        st.write("Hiện chưa có sản phẩm nào.")
+    else:
+        cols = st.columns(3)
+        for index, item in enumerate(st.session_state.products):
+            with cols[index % 3]:
+                with st.container(border=True):
+                    st.image(item["image"], use_container_width=True)
+                    st.markdown(f"### {item['name']}")
+                    st.write(f"**Giá:** {item['price']:,} VNĐ")
+                    st.write(f"**Size:** {item['size']}")
+                    
+                    if is_admin:
+                        c1, c2 = st.columns(2)
+                        
+                        if c1.button("🗑️ Xóa", key=f"del_{item['id']}", use_container_
