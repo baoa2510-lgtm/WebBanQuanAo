@@ -20,7 +20,7 @@ if "logged_in" not in st.session_state:
 
 # --- THANH BÊN (ĐĂNG NHẬP / ĐĂNG KÝ & ĐIỀU HƯỚNG) ---
 with st.sidebar:
-    st.title("📂 Menu Điều Hướng")
+    st.title("📂 Menu")
     menu = st.radio("Chọn trang:", ["🏠 Trang Chủ", "🛍️ Cửa Hàng & Quản Lý"])
     
     st.divider()
@@ -77,7 +77,6 @@ if menu == "🏠 Trang Chủ":
     col_m3.metric("Trạng thái", "Đang hoạt động 🟢")
     
     st.divider()
-    st.markdown("👉 Hãy chọn mục **🛍️ Cửa Hàng & Quản Lý** ở thanh menu bên trái để xem chi tiết các sản phẩm hoặc đăng nhập quản trị.")
 
 # --- NỘI DUNG TRANG CỬA HÀNG & QUẢN LÝ ---
 elif menu == "🛍️ Cửa Hàng & Quản Lý":
@@ -86,7 +85,7 @@ elif menu == "🛍️ Cửa Hàng & Quản Lý":
     is_admin = st.session_state.logged_in and (st.session_state.username == "admin")
 
     if is_admin:
-        st.success("🔓 Chào Admin! Bạn có quyền Thêm, Sửa, Xóa sản phẩm.")
+        st.success("🔓 Chào Admin!")
         with st.expander("➕ Thêm sản phẩm mới"):
             with st.form("add_form", clear_on_submit=True):
                 col_f1, col_f2 = st.columns(2)
@@ -117,10 +116,6 @@ elif menu == "🛍️ Cửa Hàng & Quản Lý":
                         st.rerun()
                     else:
                         st.warning("Tên sản phẩm không được để trống.")
-    elif st.session_state.logged_in:
-        st.info("ℹ️ Bạn đang đăng nhập bằng tài khoản khách hàng. Hãy đăng nhập tài khoản **admin** (mật khẩu: **123**) nếu muốn quản lý.")
-    else:
-        st.info("💡 Gợi ý: Đăng nhập tài khoản `admin` (mật khẩu `123`) ở thanh bên trái để trải nghiệm quyền quản trị Thêm/Sửa/Xóa.")
 
     st.divider()
 
