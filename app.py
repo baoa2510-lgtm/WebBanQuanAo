@@ -153,7 +153,7 @@ elif menu == "🛍️ Cửa Hàng & Quản Lý":
                                 
                                 if edit_file is not None:
                                     edit_image_path = os.path.join(UPLOAD_DIR, edit_file.name)
-                                    with open(edit_image_path, "wb") as f:
+                                    with open(edit_image_path, "wb") as f: 
                                         f.write(edit_file.getbuffer())
                                     item["image"] = edit_image_path
                                     
