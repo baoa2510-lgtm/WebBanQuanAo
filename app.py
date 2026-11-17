@@ -68,12 +68,11 @@ if menu == "🏠 Trang Chủ":
     st.title("🌟 Chào Mừng Đến Với Cửa Hàng Thời Trang")
     
     # Sử dụng ảnh banner mặc định an toàn
-    st.image("https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200", use_container_width=True)
+    st.image("https://l1nq.com/q01bzfx", use_container_width=True)
     
     st.subheader("📊 Tổng Quan Cửa Hàng")
     col_m1, col_m2, col_m3 = st.columns(3)
     col_m1.metric("Tổng số sản phẩm", len(st.session_state.products))
-    col_m2.metric("Thành viên hệ thống", len(st.session_state.users))
     col_m3.metric("Trạng thái", "Đang hoạt động 🟢")
     
     st.divider()
