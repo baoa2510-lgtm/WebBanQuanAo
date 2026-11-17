@@ -35,8 +35,13 @@ if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
     st.session_state.username = ""
 
-# --- THANH BÊN (ĐĂNG NHẬP / ĐĂNG KÝ) ---
+# --- THANH BÊN (ĐĂNG NHẬP / ĐĂNG KÝ & ĐIỀU HƯỚNG) ---
 with st.sidebar:
+    st.title("📂 Menu Điều Hướng")
+    # Tạo menu chuyển đổi giữa Trang chủ và Cửa hàng sản phẩm
+    menu = st.radio("Chọn trang:", ["🏠 Trang Chủ", "🛍️ Cửa Hàng & Quản Lý"])
+    
+    st.divider()
     st.title("Tài Khoản")
     
     if not st.session_state.logged_in:
@@ -76,88 +81,32 @@ with st.sidebar:
             st.session_state.username = ""
             st.rerun()
 
-# --- GIAO DIỆN CHÍNH ---
-st.title("👕 Cửa Hàng Quần Áo Trực Tuyến")
+# --- NỘI DUNG TRANG CHỦ ---
+if menu == "🏠 Trang Chủ":
+    st.title("🌟 Chào Mừng Đến Với Cửa Hàng Thời Trang")
+    st.markdown("Nơi cung cấp các xu hướng thời trang trẻ trung, năng động và phong cách.")
+    
+    # Banner / Hình ảnh giới thiệu trang chủ
+    st.image("https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200", use_container_width=True)
+    
+    st.subheader("📊 Tổng Quan Cửa Hàng")
+    col1, col2, col3 = st.columns(3)
+    col1.metric("Tổng số sản phẩm", len(st.session_state.products))
+    col2.metric("Thành viên hệ thống", len(st.session_state.users))
+    col3.metric("Trạng thái", "Đang hoạt động 🟢")
+    
+    st.divider()
+    st.markdown("👉 Hãy chọn mục **🛍️ Cửa Hàng & Quản Lý** ở thanh menu bên trái để xem chi tiết các sản phẩm hoặc đăng nhập quản trị.")
 
-# Kiểm tra nếu là ADMIN thì mới hiện form Thêm sản phẩm
-is_admin = st.session_state.logged_in and (st.session_state.username == "admin")
+# --- NỘI DUNG TRANG CỬA HÀNG & QUẢN LÝ ---
+elif menu == "🛍️ Cửa Hàng & Quản Lý":
+    st.title("👕 Cửa Hàng Quần Áo Trực Tuyến")
 
-if is_admin:
-    st.success("🔓 Chào Admin! Bạn có quyền Thêm, Sửa, Xóa sản phẩm.")
-    with st.expander("➕ Thêm sản phẩm mới"):
-        with st.form("add_form", clear_on_submit=True):
-            col1, col2 = st.columns(2)
-            new_name = col1.text_input("Tên sản phẩm")
-            new_price = col2.number_input("Giá bán (VNĐ)", min_value=0, step=10000)
-            new_size = col1.text_input("Kích cỡ (VD: S, M, L)")
-            
-            # Chọn ảnh từ thư mục máy tính
-            uploaded_file = st.file_uploader("Tải ảnh sản phẩm từ máy tính", type=["jpg", "jpeg", "png"])
-            
-            if st.form_submit_button("Lưu sản phẩm"):
-                if new_name:
-                    image_path = "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400" # Ảnh mặc định
-                    
-                    if uploaded_file is not None:
-                        # Lưu file vào thư mục uploads
-                        image_path = os.path.join(UPLOAD_DIR, uploaded_file.name)
-                        with open(image_path, "wb") as f:
-                            f.write(uploaded_file.getbuffer())
-                    
-                    new_id = max([p["id"] for p in st.session_state.products], default=0) + 1
-                    st.session_state.products.append({
-                        "id": new_id,
-                        "name": new_name,
-                        "price": new_price,
-                        "size": new_size,
-                        "image": image_path
-                    })
-                    st.success("Đã thêm sản phẩm kèm ảnh thành công!")
-                    st.rerun()
-                else:
-                    st.warning("Tên sản phẩm không được để trống.")
+    # Kiểm tra nếu là ADMIN thì mới hiện form Thêm sản phẩm
+    is_admin = st.session_state.logged_in and (st.session_state.username == "admin")
 
-st.divider()
-
-# --- HIỂN THỊ DANH SÁCH SẢN PHẨM ---
-st.subheader("Danh sách sản phẩm")
-
-if not st.session_state.products:
-    st.write("Hiện chưa có sản phẩm nào.")
-else:
-    cols = st.columns(3)
-    for index, item in enumerate(st.session_state.products):
-        with cols[index % 3]:
-            with st.container(border=True):
-                st.image(item["image"], use_container_width=True)
-                st.markdown(f"### {item['name']}")
-                st.write(f"**Giá:** {item['price']:,} VNĐ")
-                st.write(f"**Size:** {item['size']}")
-                
-                # Nút Sửa / Xóa CHỈ HIỆN KHI LÀ ADMIN
-                if is_admin:
-                    c1, c2 = st.columns(2)
-                    
-                    if c1.button("🗑️ Xóa", key=f"del_{item['id']}", use_container_width=True):
-                        st.session_state.products = [p for p in st.session_state.products if p["id"] != item["id"]]
-                        st.rerun()
-                        
-                    with c2.popover("✏️ Sửa", use_container_width=True):
-                        edit_name = st.text_input("Tên", value=item["name"], key=f"ename_{item['id']}")
-                        edit_price = st.number_input("Giá", value=item["price"], step=10000, key=f"eprice_{item['id']}")
-                        edit_size = st.text_input("Size", value=item["size"], key=f"esize_{item['id']}")
-                        
-                        edit_file = st.file_uploader("Thay đổi ảnh từ máy", type=["jpg", "jpeg", "png"], key=f"efile_{item['id']}")
-                        
-                        if st.button("Cập nhật", key=f"save_{item['id']}"):
-                            item["name"] = edit_name
-                            item["price"] = edit_price
-                            item["size"] = edit_size
-                            
-                            if edit_file is not None:
-                                edit_image_path = os.path.join(UPLOAD_DIR, edit_file.name)
-                                with open(edit_image_path, "wb") as f:
-                                    f.write(edit_file.getbuffer())
-                                item["image"] = edit_image_path
-                                
-                            st.rerun()
+    if is_admin:
+        st.success("🔓 Chào Admin! Bạn có quyền Thêm, Sửa, Xóa sản phẩm.")
+        with st.expander("➕ Thêm sản phẩm mới"):
+            with st.form("add_form", clear_on_submit=True):
+                col1, col2
