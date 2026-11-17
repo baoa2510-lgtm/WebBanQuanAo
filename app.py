@@ -85,7 +85,7 @@ if menu == "🏠 Trang Chủ":
     st.title("🌟 Chào Mừng Đến Với Cửa Hàng Thời Trang Đẳng Cấp 6789")
     st.markdown("Nơi cung cấp các xu hướng thời trang trẻ trung, năng động và phong cách.")
     
-    st.image("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdmK_7Pz8GWyrRCuPyw28fjO36fb2LhE9Z0JQzgGFCQk6x8Z03p-Sn_Q2w&s=10", use_container_width=True)
+    st.image("https://report.adidas-group.com/2022/en/_assets/gallery/mag-2-hero.jpg", use_container_width=True)
     
     st.subheader("📊 Tổng Quan Cửa Hàng")
     col_m1, col_m2, col_m3 = st.columns(3)
