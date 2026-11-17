@@ -85,7 +85,7 @@ if menu == "🏠 Trang Chủ":
     st.title("🌟 Chào Mừng Đến Với Cửa Hàng Thời Trang Đẳng Cấp 6789")
     st.markdown("Nơi cung cấp các xu hướng thời trang trẻ trung, năng động và phong cách.")
     
-    st.image("https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200", use_container_width=True)
+    st.image("blob:https://gemini.google.com/499796bc-5b47-4126-88b0-ffe7012ceafc", use_container_width=True)
     
     st.subheader("📊 Tổng Quan Cửa Hàng")
     col_m1, col_m2, col_m3 = st.columns(3)
