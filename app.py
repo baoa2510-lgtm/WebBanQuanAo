@@ -37,7 +37,7 @@ if "logged_in" not in st.session_state:
 
 # --- THANH BÊN (ĐĂNG NHẬP / ĐĂNG KÝ & ĐIỀU HƯỚNG) ---
 with st.sidebar:
-    st.title("📂 Menu Điều Hướng")
+    st.title("📂 Menu")
     # Giữ nguyên cấu trúc menu bạn đã chỉnh sửa
     menu = st.radio("Chọn trang:", ["🏠 Trang Chủ", "🛍️ Cửa Hàng"])
     
